@@ -265,6 +265,15 @@ mark{background:var(--eos-soft);color:var(--eos);font-weight:600;padding:.05em .
   font:10.5px var(--mono);color:var(--ink3);justify-content:space-between}
 kbd{font:10px var(--mono);color:var(--ink3);border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:1px 5px;background:var(--wash)}
 @media (hover:none){.kbdonly{display:none}}
+/* ---------- 学习模式（L3）：除卡片外不留任何内容 ---------- */
+/* 顶栏（标识/面包屑/栏目页签/搜索）整块隐掉，只留卡与拇指操作条；操作条是**操作面**不是内容。
+   没有 hash 路由，浏览器返回键会直接离开站点，所以退出入口必须留在屏上（.fexit）。 */
+body.focus .bar{display:none}
+body.focus .wrap{padding-top:calc(14px + env(safe-area-inset-top))}
+body.focus .deck{margin-top:0}
+.fline{display:flex;align-items:center;gap:10px}
+.fexit{color:var(--hem);cursor:pointer;border-bottom:1px dashed currentColor;padding-bottom:1px}
+.fexit:active{opacity:.6}
 .empty{padding:52px 0;text-align:center;color:var(--ink3);font:13px var(--mono)}
 .empty b{color:var(--eos)}
 </style></head><body>
@@ -395,7 +404,7 @@ function nav(){
        <button class="ab ${d?"ok":"main"}" onclick="markDone('${esc(c.id)}')">${d?"已掌握 ✓":"标记掌握"}</button>
        <button class="ab" onclick="step(1)" ${S.i>=k.cards.length-1?"disabled":""}>下一张 →</button>`;
     ln.innerHTML=`<span>${S.i+1} / ${k.cards.length} · ${esc(c.typeLabel)}</span>
-      <span class="kbdonly"><kbd>←</kbd><kbd>→</kbd> 或左右滑动翻卡 · <kbd>M</kbd> 掌握</span>`;
+      <span class="fline"><span class="kbdonly"><kbd>←</kbd><kbd>→</kbd> 或左右滑动翻卡 · <kbd>M</kbd> 掌握</span><a class="fexit" onclick="go(2,${S.kd},0)">‹ 退出学习</a></span>`;
     return;
   }
   if(S.lv===2){const k=KD.find(x=>x.k===S.kd);
@@ -673,6 +682,21 @@ function tabs(){
   el.innerHTML=COLS.map(c=>`<a class="tb${c.id===COL.id&&S.lv?" on":""}" onclick="switchCol('${c.id}')">`+
     `${c.code?`<i>${esc(c.code)}</i>`:""}${esc(c.name)}<b>${VIEW[c.id].MAIN.length}</b></a>`).join("");
 }
+let FOCUS=false;
+function focusMode(on){
+  document.body.classList.toggle("focus",on);
+  if(on===FOCUS)return;
+  FOCUS=on;
+  // 全屏是加分项：iOS Safari 与内嵌 webview 不支持，失败就安静留在「隐藏顶栏」这一层。
+  // 只在进/出 L3 的那一刻请求（浏览器要求用户手势，且重复请求会抛）。
+  const de=document.documentElement;
+  try{
+    if(on&&!document.fullscreenElement&&de.requestFullscreen)
+      de.requestFullscreen({navigationUI:"hide"}).catch(()=>{});
+    else if(!on&&document.fullscreenElement&&document.exitFullscreen)
+      document.exitFullscreen().catch(()=>{});
+  }catch(e){}
+}
 function draw(){
   document.getElementById("crumb").innerHTML=crumb();
   document.getElementById("pager").textContent=pager();
@@ -680,6 +704,7 @@ function draw(){
   const a=document.getElementById("app");
   (S.lv===4?lv4:S.lv===0?lv0:S.lv===1?lv1:S.lv===2?lv2:lv3)();
   if(S.lv!==3){a.className="v-in";void a.offsetWidth;}else a.className="";
+  focusMode(S.lv===3);
   nav();
 }
 const qs=document.getElementById("qs"), sbox=document.getElementById("sbox");
