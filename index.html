@@ -12,6 +12,7 @@
   --eos:#e0447a; --eos-soft:#ffeef4;
   --amber:#d98a12; --amber-soft:#fff5e2; --grn:#0f9d68; --grn-soft:#e7f8f1;
   --wine:#a83a6b; --teal:#0e8fa8;
+  --teal-soft:#e4f6fa; --wine-soft:#fbeaf1;
   --sans:"Source Han Sans SC","Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
   --serif:"Source Han Serif SC","Noto Serif SC","Songti SC","SimSun",serif;
   --mono:ui-monospace,"Cascadia Mono",Consolas,"Noto Sans Mono CJK SC",monospace;
@@ -157,27 +158,41 @@ h1{font:600 21px/1.42 var(--sans);margin:7px 0 6px;letter-spacing:-.006em}
 @media (hover:hover){.ghead .gmap:hover{border-color:var(--hem);background:#fff}}
 .mmgo{color:var(--hem);cursor:pointer;border-bottom:1px dashed currentColor}
 
-/* ---------- L5 思维导图：一层缩进 = 一个枝，折行靠左引导线 ---------- */
-.mm{margin-top:4px}
-.mm-n{position:relative}
-.mm-h{display:flex;align-items:flex-start;gap:7px;padding:5px 0}
-.mm-d1>.mm-h{padding:10px 0 6px;border-bottom:1px solid var(--line2)}
-.mm-t{flex:none;width:16px;height:16px;margin-top:4px;padding:0;display:flex;align-items:center;
-  justify-content:center;border:1px solid var(--line);border-radius:5px;background:var(--wash);
-  color:var(--ink3);font:8px var(--mono);cursor:pointer}
-.mm-t:active{border-color:var(--hem2);color:var(--hem);background:var(--hem-soft)}
-.mm-t2{border:0;background:transparent}
-.mm-b{min-width:0;flex:1}
-.mm-l{font:600 14.5px/1.6 var(--sans);letter-spacing:-.004em}
-.mm-d2>.mm-h>.mm-b>.mm-l{font-weight:500;font-size:14px}
-.mm-d3>.mm-h>.mm-b>.mm-l{font-weight:400;font-size:13.5px;color:var(--ink2)}
-.mm-l.j{color:var(--hem);cursor:pointer;border-bottom:1px dashed var(--hem2)}
-.mm-c{font:10px var(--mono);font-style:normal;color:var(--ink3);margin-left:7px;
-  font-variant-numeric:tabular-nums;vertical-align:.1em}
-.mm-o{font:12.5px/1.66 var(--serif);color:var(--ink2);margin-top:1px}
-.mm-k{margin-left:5px;padding-left:11px;border-left:1px solid var(--line)}
+/* ---------- L5 思维导图：节点是盒子，子树用折线挂在自己的枝上 ---------- */
+/* 每个主枝分一种色（--c），CSS 变量沿 DOM 往下继承，所以整条子树同色——
+   「同一枝的知识是一件事」这件事靠颜色说，不靠缩进说 */
+.mm{margin-top:12px;--c:var(--hem)}
+.mm-n{position:relative;margin-bottom:9px}
+.mm-h{position:relative;display:block;background:var(--card);border:1px solid var(--line);
+  border-left:3px solid var(--c);border-radius:11px;padding:10px 44px 10px 12px;
+  box-shadow:var(--lift);transition:border-color .15s,box-shadow .15s}
+.mm-br>.mm-h{cursor:pointer}
+/* 主枝盒子上了自己那一枝的底色：整条支线一眼能追到底，这是「导图」而不是「清单」的关键 */
+.mm-d1.mm-br>.mm-h{background:var(--cs);border-color:var(--c)}
+.mm-br>.mm-h:active{border-color:var(--c);box-shadow:var(--lift-h)}
+/* 叶子盒整块可点（44px 高的热区比一行字好按），所以光标和配色都要说「这是按钮」 */
+.mm-j>.mm-h{cursor:pointer;border-left-color:var(--c)}
+.mm-j>.mm-h>.mm-l{color:var(--c)}
+.mm-j>.mm-h:active{background:var(--wash)}
+.mm-l{font:600 15px/1.5 var(--sans);letter-spacing:-.004em;padding-right:2px}
+.mm-d2>.mm-h>.mm-l{font-size:14px;font-weight:600}
+.mm-d3>.mm-h>.mm-l{font-size:13.5px;font-weight:500;color:var(--ink2)}
+.mm-o{font:12.5px/1.62 var(--serif);color:var(--ink2);margin-top:5px;padding-top:5px;
+  border-top:1px dashed var(--line)}
+.mm-x{position:absolute;right:8px;top:8px;display:flex;align-items:center;gap:3px;
+  font:10px var(--mono);color:var(--c);background:var(--wash);border:1px solid var(--line);
+  border-radius:20px;padding:3px 7px;line-height:1.5;white-space:nowrap;font-variant-numeric:tabular-nums}
+.mm-n.fold>.mm-h>.mm-l{color:var(--c)}
+/* 子树容器：左边一条竖直枝线，每个子节点用自己的小横线接上去（肘形连线） */
+.mm-k{position:relative;margin:9px 0 0 12px;padding-left:16px;border-left:2px solid var(--c)}
+.mm-k>.mm-n:before{content:"";position:absolute;left:-18px;top:22px;width:16px;
+  border-top:2px solid var(--c)}
 .mm-n.fold>.mm-k{display:none}
-.mm-d1.fold>.mm-h>.mm-b>.mm-l{color:var(--hem)}
+/* 根节点：整张图只有一个中心题，视觉上比枝重一档 */
+.mm-root>.mm-h{border-left-width:4px;padding-right:12px;background:var(--hem-soft);
+  border-color:var(--hem2);border-left-color:var(--hem)}
+.mm-root>.mm-h>.mm-l{font:600 16.5px/1.45 var(--serif);letter-spacing:.01em}
+.mm-root>.mm-h>.mm-o{border-top:0;margin-top:3px;padding-top:0;font:11.5px var(--mono);color:var(--ink3)}
 .mmnote{margin:18px 0 4px;padding:12px 14px;border:1px dashed var(--line);border-radius:12px;
   font:11.5px/1.75 var(--mono);color:var(--ink3)}
 
@@ -398,8 +413,11 @@ function snip(c,ts){
 /* ---------- 路由 ---------- */
 function go(lv,kd,i,anim){S={lv,kd:kd==null?S.kd:String(kd),i:i==null?S.i:(i||0),q:S.q,
   anim:anim||"in",back:lv===4?S.back:lv,dir:1,rv:false,col:COL.id,tp:S.tp};scroll0();draw();}
-function go5(tp){MMF=false;S={lv:5,kd:S.kd,i:S.i,q:S.q,anim:"in",back:1,dir:1,rv:false,
-  col:COL.id,tp:String(tp)};scroll0();draw();}
+function go5(tp){MMV="auto";const m=mmOf(tp);
+  // 超过 ~120 个知识点就默认只展开到主枝：一屏能看完这张图的结构，想背哪枝点开哪枝
+  MM0=!!m&&mmLeaf(m.tree)>120;
+  S={lv:5,kd:S.kd,i:S.i,q:S.q,anim:"in",back:1,dir:1,rv:false,
+    col:COL.id,tp:String(tp)};scroll0();draw();}
 function switchCol(id){useCol(id);S.col=id;
   S.q="";qs.value="";sbox.classList.remove("has");go(1,0,0,"in");}
 function scroll0(){window.scrollTo(0,0);}
@@ -449,7 +467,7 @@ function nav(){
       <button class="ab ghost" onclick="go(3,'${k.k}',0,'u')">开始背这一组 →</button>`;
     ln.innerHTML=`<span>${k.n} 张卡 · 已掌握 ${k.cards.filter(c=>isDone(c.id)).length}</span><span>点任意条目直接进卡片</span>`;return;}
   if(S.lv===5){el.innerHTML=`<button class="ab" onclick="go(1,0,0,'in')">← 全部${UNIT}</button>
-      <button class="ab ghost" onclick="mfall(this)">${MMF?"展开所有分支":"收起所有分支"}</button>`;
+      <button class="ab ghost" onclick="mfall(this)">${mmOpen()?"收起所有分支":"展开所有分支"}</button>`;
     ln.innerHTML=`<span>专题 ${esc(S.tp)} 思维导图</span>
       <span>${mmHas(S.tp)&&mmOf(S.tp).k==="bank"?"点枝名直达该卡":"点 ▾ 可收起分支"}</span>`;return;}
   if(S.lv===4){el.innerHTML=`<button class="ab" onclick="setQ('')">← 清空搜索</button>`;
@@ -554,20 +572,29 @@ const mmHas=tp=>tp!=null&&!!mmOf(tp);
 const mmTopic=tp=>{const k=KD.find(x=>String(x.topic)===String(tp));return k?(k.topicTitle||""):"";};
 function mmLeaf(n){let s=0;(function w(x){if((x.children||[]).length)x.children.forEach(w);else s++;})(n);return s;}
 function mmStat(t){return{br:(t.children||[]).length,lf:mmLeaf(t)};}
-function mmnode(n,d){
-  const k=n.children||[];
-  const lab=n.id?`<span class="mm-l j" onclick="mmjump('${esc(n.id)}')">${esc(n.label)}</span>`
-                 :`<span class="mm-l">${esc(n.label)}</span>`;
-  return `<div class="mm-n mm-d${d>2?3:d}${MMF&&k.length?" fold":""}">`+
-    `<div class="mm-h">`+
-      (k.length?`<span class="mm-t" onclick="mtog(this)">${MMF?"▸":"▾"}</span>`:`<span class="mm-t mm-t2"></span>`)+
-      `<div class="mm-b">${lab}${k.length?`<i class="mm-c">${mmLeaf(n)}</i>`:""}`+
-      (n.note?`<div class="mm-o">${esc(n.note)}</div>`:"")+`</div></div>`+
-    (k.length?`<div class="mm-k">${k.map(c=>mmnode(c,d+1)).join("")}</div>`:"")+`</div>`;
+const MMH=[["var(--hem)","var(--hem-soft)"],["var(--teal)","var(--teal-soft)"],
+           ["var(--grn)","var(--grn-soft)"],["var(--amber)","var(--amber-soft)"],
+           ["var(--eos)","var(--eos-soft)"],["var(--wine)","var(--wine-soft)"]];
+let MM0=false,MMV="auto";   // MM0=这棵树够大，默认只露主枝；MMV=auto|open|shut（用户是否手动全展开/全收起过）
+const mmFold=d=>MMV==="shut"||(MMV==="auto"&&MM0&&d===1);
+const mmOpen=()=>MMV==="open"||(MMV==="auto"&&!MM0);
+function mmnode(n,d,ix){
+  const k=n.children||[], kid=k.length, jump=!kid&&n.id;
+  // 只有主枝带 --c/--cs：CSS 变量沿 DOM 继承，整条子树（连线、字色、徽标）跟着同色
+  const hue=d===1?` style="--c:${MMH[ix%6][0]};--cs:${MMH[ix%6][1]}"`:"";
+  const fold=mmFold(d)&&kid;
+  const cls="mm-n mm-d"+Math.min(d,3)+(kid?" mm-br":"")+(jump?" mm-j":"")+(fold?" fold":"");
+  const click=kid?` onclick="mtog(this)" data-c="${mmLeaf(n)}"`:(jump?` onclick="mmjump('${esc(n.id)}')"`:"");
+  const badge=kid?`<span class="mm-x">${mmLeaf(n)}${fold?" ▸":" ▾"}</span>`:(jump?'<span class="mm-x">›</span>':"");
+  return `<div class="${cls}"${hue}><div class="mm-h"${click}>`+
+    `<div class="mm-l">${esc(n.label)}</div>`+
+    (n.note?`<div class="mm-o">${esc(n.note)}</div>`:"")+badge+`</div>`+
+    (kid?`<div class="mm-k">${k.map((c,j)=>mmnode(c,d+1,j)).join("")}</div>`:"")+`</div>`;
 }
-function mtog(el){const n=el.closest(".mm-n"),f=n.classList.toggle("fold");
-  el.textContent=f?"▸":"▾";}
-function mfall(btn){MMF=!MMF;draw();}
+function mtog(el){const n=el.parentElement,f=n.classList.toggle("fold");
+  // 计数在渲染时就写进 data-c：这里不能拿 DOM 节点去走 mmLeaf（DOM 的 .children 是 HTMLCollection，没有 forEach）
+  const b=n.querySelector(":scope>.mm-h>.mm-x");if(b)b.textContent=(el.dataset.c||"")+(f?" ▸":" ▾");}
+function mfall(btn){MMV=mmOpen()?"shut":"open";draw();}   // 手动切换会盖掉「大树默认只露主枝」
 function mmjump(id){const c=MAIN.find(x=>x.id===id);if(!c)return;
   const k=KD.find(x=>x.k===String(c.kaodian));if(!k)return;go(3,k.k,k.cards.indexOf(c),"u");}
 function lv5(){
@@ -578,12 +605,17 @@ function lv5(){
     `<div class="empty">暂无导图 —— 知识点仍可回目录逐张背</div>`;return;}
   const st=mmStat(m.tree);
   app.innerHTML=head+
-    `<div class="sub"><i>${st.br}</i> 个主枝 · <i>${st.lf}</i> 条知识点 · `+
-    `${m.k==="map"?"枝与要点照录资料文字层":"枝名即题干，要点即作答首句"}</div></div>`+
-    `<div class="mm stag">${(m.tree.children||[]).map(c=>mmnode(c,1)).join("")}</div>`+
+    `<div class="sub"><i>${st.br}</i> 条主枝 · <i>${st.lf}</i> 个知识点 · `+
+    `${m.k==="map"?"枝与要点照录资料文字层":"枝名即考点，叶名即题干"}</div></div>`+
+    `<div class="mm stag"><div class="mm-n mm-root mm-d1">`+
+      `<div class="mm-h"><div class="mm-l">${esc(mmTopic(S.tp)||("专题 "+S.tp))}</div>`+
+      `<div class="mm-o">${st.br} 条主枝 · ${st.lf} 个知识点 · `+
+      `${mmOpen()?"点枝盒收起 / 展开这一枝":"默认只到主枝，点枝盒看这一枝的细节"}</div></div>`+
+      `<div class="mm-k">${(m.tree.children||[]).map((c,j)=>mmnode(c,1,j)).join("")}</div>`+
+    `</div></div>`+
     `<div class="mmnote">${m.k==="map"
-      ?"导图取自资料自带的专题结构总览：根 › 主枝 › 叶，文字逐字照录、未作改写与增补。原页是受限资料，只公开到这一层文字结构。"
-      :"这一专题的资料里没有导图页，此树由本专题卡片自身的层级生成：主枝是考点，叶名是题干，要点是作答首句。点蓝色题干可直达该卡。"}</div>`;
+      ?"这张图取自资料自带的专题结构总览：中心题 › 主枝 › 知识点，文字逐字照录、未作改写与增补；同一条枝用同一种颜色。"
+      :"这一专题的资料里没有导图页，此树由本专题卡片自身的层级生成：主枝是考点，叶盒里是题干与作答首句。点叶子盒直接进那张卡。"}</div>`;
 }
 
 /* ---------- 搜索 ---------- */
