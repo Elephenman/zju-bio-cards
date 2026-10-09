@@ -386,7 +386,7 @@ function nav(){
   if(S.lv===3){
     const k=KD.find(x=>x.k===S.kd), c=k.cards[S.i], d=isDone(c.id);
     el.innerHTML=
-      `<button class="ab" onclick="step(-1)" ${S.i?"disabled":""}>← 上一张</button>
+      `<button class="ab" onclick="step(-1)" ${S.i?"":"disabled"}>← 上一张</button>
        <button class="ab ${d?"ok":"main"}" onclick="markDone('${esc(c.id)}')">${d?"已掌握 ✓":"标记掌握"}</button>
        <button class="ab" onclick="step(1)" ${S.i>=k.cards.length-1?"disabled":""}>下一张 →</button>`;
     ln.innerHTML=`<span>${S.i+1} / ${k.cards.length} · ${esc(c.typeLabel)}</span>
